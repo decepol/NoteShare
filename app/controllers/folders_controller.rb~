@@ -1,7 +1,8 @@
 class FoldersController < ApplicationController
 
   #before_filter :authenticate_user!, :except => [:habubaba]
-  before_filter :authenticate_user!, :only => [:create]
+  #before_filter :authenticate_user!, :only => [:create]
+  before_filter :authenticate_user!
 
   # GET /folders
   # GET /folders.json
