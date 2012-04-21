@@ -3,6 +3,14 @@ NoteShare/Gemfile.lock
 *.pyc
 *.pyo
 
-tmp/*.*
+/tmp/*.*
 /db/test.sqlite3
 /log/test.log
+/log/development.log
+/db/development.sqlite3
+
+/tmp/cache
+/tmp/pids
+/tmp/sessions
+/tmp/sockets
+/db/development.sqlite3

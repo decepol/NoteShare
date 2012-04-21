@@ -3,8 +3,8 @@ require 'spec_helper'
 describe "paragraphs/show" do
   before(:each) do
     @paragraph = assign(:paragraph, stub_model(Paragraph,
-      :prev => "",
-      :next => "",
+      :prev => nil,
+      :next => nil,
       :body => "MyText"
     ))
   end
