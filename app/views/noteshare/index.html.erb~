@@ -1,0 +1,8 @@
+<h1>Noteshare</h1>
+<%= user_signed_in %>
+<% if user_signed_in? %>
+  <p>Zaloguj się aby dodawać notatki i dzielić się nimi z innymi.</p>
+<% else %>
+  <p>Wybierz notatki które chcesz przejrzeć / edytować</p>
+<% end %>
+

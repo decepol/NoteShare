@@ -1,4 +1,17 @@
 NoteShare::Application.routes.draw do
+  get "noteshare/index"
+
+  resources :notes
+
+  resources :folders
+
+  devise_for :users
+
+  namespace :user do
+    root :to => "folders#index"
+  end
+
+  root :to => "noteshare#index"
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
