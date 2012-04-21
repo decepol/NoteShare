@@ -1,1 +1,8 @@
 NoteShare/Gemfile.lock
+*.class
+*.pyc
+*.pyo
+
+tmp/*.*
+/db/test.sqlite3
+/log/test.log

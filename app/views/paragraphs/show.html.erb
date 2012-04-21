@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id</b>
+  <%= @paragraph.id %>
+</p>
+
+<p>
+  <b>Prev Id:</b>
+  <% unless @paragraph.prev.nil? %>
+  	<%= @paragraph.prev.id %>
+  <% end %>
+</p>
+
+<p>
+  <b>Next Id:</b>
+  <% unless @paragraph.next.nil? %>
+  	<%= @paragraph.next.id %>
+  <% end %>
+</p>
+
+<p>
+  <b>Body:</b>
+  <%= @paragraph.body %>
+</p>
+
+<p>
+  <b>Chain</b>
+  <% 
+  	iterator = @paragraph
+  	until iterator.nil? 
+   %>
+  		<%= iterator.id %> ->
+  <%  iterator = iterator.next
+  	end
+   %>
+</p>
+
+<%= link_to 'Edit', edit_paragraph_path(@paragraph) %> |
+<%= link_to 'Back', paragraphs_path %>
