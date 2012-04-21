@@ -14,3 +14,4 @@ NoteShare/Gemfile.lock
 /tmp/sessions
 /tmp/sockets
 /db/development.sqlite3
+/log/development.log
