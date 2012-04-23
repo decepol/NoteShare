@@ -43,7 +43,7 @@ class ParagraphsController < ApplicationController
         prevParagraph.next = @paragraph
         
         @paragraph.save!
-        prevParagraph.save!     
+        prevParagraph.save!  
       end
     rescue ActiveRecord::RecordInvalid => invalid
       respond_to do |format|

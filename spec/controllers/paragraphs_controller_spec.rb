@@ -20,18 +20,44 @@ require 'spec_helper'
 
 describe ParagraphsController do
 
-  # This should return the minimal set of attributes required to create a valid
-  # Paragraph. As you add validations to Paragraph, be sure to
-  # update the return value of this method accordingly.
+# This should return the minimal set of attributes required to create a valid
+# Paragraph. As you add validations to Paragraph, be sure to
+# update the return value of this method accordingly.
   def valid_attributes
     {}
   end
-  
+
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # ParagraphsController. Be sure to keep this updated too.
   def valid_session
     {}
+  end
+
+  def connect_paragraphs(paragraph_1, paragraph_2)
+    paragraph_1.next = paragraph_2
+    paragraph_2.prev = paragraph_1
+    
+    paragraph_1.save!
+    paragraph_2.save!  
+  end
+
+  def create_2_connected_paragraphs
+    first_paragraph = Paragraph.create! valid_attributes
+    second_paragraph = Paragraph.create! valid_attributes
+    
+    connect_paragraphs(first_paragraph, second_paragraph)
+
+    return first_paragraph, second_paragraph
+  end
+
+  def create_3_connected_paragraphs
+    first_paragraph, second_paragraph = create_2_connected_paragraphs
+    third_paragraph = Paragraph.create! valid_attributes
+    
+    connect_paragraphs(second_paragraph, third_paragraph)
+    
+    return first_paragraph, second_paragraph, third_paragraph
   end
 
   describe "GET index" do
@@ -87,14 +113,14 @@ describe ParagraphsController do
 
     describe "with invalid params" do
       it "assigns a newly created but unsaved paragraph as @paragraph" do
-        # Trigger the behavior that occurs when invalid params are submitted
+      # Trigger the behavior that occurs when invalid params are submitted
         Paragraph.any_instance.stub(:save).and_return(false)
         post :create, {:paragraph => {}}, valid_session
         assigns(:paragraph).should be_a_new(Paragraph)
       end
 
       it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
+      # Trigger the behavior that occurs when invalid params are submitted
         Paragraph.any_instance.stub(:save).and_return(false)
         post :create, {:paragraph => {}}, valid_session
         response.should render_template("new")
@@ -147,13 +173,77 @@ describe ParagraphsController do
   end
 
   describe "DELETE destroy" do
-    it "destroys the requested paragraph" do
-      paragraph = Paragraph.create! valid_attributes
-      expect {
-        delete :destroy, {:id => paragraph.to_param}, valid_session
-      }.to change(Paragraph, :count).by(-1)
+    describe "no connection to other paragraphs" do
+      it "destroys the requested paragraph" do
+        paragraph = Paragraph.create! valid_attributes
+        expect {
+          delete :destroy, {:id => paragraph.to_param}, valid_session
+        }.to change(Paragraph, :count).by(-1)
+      end
     end
 
+    describe "2 connected paragraphs" do
+      it "destroys the requested paragraph" do
+        first_paragraph, second_paragraph = create_2_connected_paragraphs
+        
+        expect {
+          delete :destroy, {:id => first_paragraph.to_param}, valid_session
+        }.to change(Paragraph, :count).by(-1)
+      end
+      
+      it "sets prev of second_paragraph to nil" do
+        first_paragraph, second_paragraph = create_2_connected_paragraphs
+        
+        delete :destroy, {:id => first_paragraph.to_param}, valid_session
+        
+        modified_second_paragraph = Paragraph.find(second_paragraph.id)
+        
+        modified_second_paragraph.prev.should be_nil     
+      end
+      
+      it "sets next of first_paragraph to nil" do
+        first_paragraph, second_paragraph = create_2_connected_paragraphs
+        
+        delete :destroy, {:id => second_paragraph.to_param}, valid_session
+        
+        modified_first_paragraph = Paragraph.find(first_paragraph.id)
+        
+        modified_first_paragraph.next.should be_nil     
+      end
+    end 
+
+    describe "3 connected paragraphs" do
+      it "destroys the requested paragraph" do
+        first_paragraph, second_paragraph, third_paragraph = create_3_connected_paragraphs
+        
+        expect {
+          delete :destroy, {:id => second_paragraph.to_param}, valid_session
+        }.to change(Paragraph, :count).by(-1)
+      end
+      
+      it "sets prev of third_paragraph to first_paragraph" do
+        first_paragraph, second_paragraph, third_paragraph = create_3_connected_paragraphs
+        
+        delete :destroy, {:id => second_paragraph.to_param}, valid_session
+        
+        modified_first_paragraph = Paragraph.find(first_paragraph.id)
+        modified_third_paragraph = Paragraph.find(third_paragraph.id)
+
+        modified_first_paragraph.id.should equal(modified_third_paragraph.prev.id) 
+      end
+      
+      it "sets next of third_paragraph to first_paragraph" do
+        first_paragraph, second_paragraph, third_paragraph = create_3_connected_paragraphs
+        
+        delete :destroy, {:id => second_paragraph.to_param}, valid_session
+        
+        modified_first_paragraph = Paragraph.find(first_paragraph.id)
+        modified_third_paragraph = Paragraph.find(third_paragraph.id)
+
+        modified_third_paragraph.id.should equal(modified_first_paragraph.next.id)
+      end
+    end 
+    
     it "redirects to the paragraphs list" do
       paragraph = Paragraph.create! valid_attributes
       delete :destroy, {:id => paragraph.to_param}, valid_session
