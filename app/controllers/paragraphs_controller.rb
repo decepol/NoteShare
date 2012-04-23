@@ -99,12 +99,36 @@ class ParagraphsController < ApplicationController
   # DELETE /paragraphs/1
   # DELETE /paragraphs/1.json
   def destroy
-    @paragraph = Paragraph.find(params[:id])
-    @paragraph.destroy
 
-    respond_to do |format|
-      format.html { redirect_to paragraphs_url }
-      format.json { head :no_content }
+
+    begin
+      Paragraph.transaction do
+        @paragraph = Paragraph.find(params[:id])
+        
+        unless @paragraph.next.nil? or @paragraph.prev.nil?
+          prev_paragraph = @paragraph.prev
+          next_paragraph = @paragraph.next
+          
+          prev_paragraph.next = next_paragraph
+          next_paragraph.prev = prev_paragraph
+          
+          prev_paragraph.save!
+          next_paragraph.save!
+        end
+        
+        @paragraph.destroy
+      end
+    rescue ActiveRecord::RecordInvalid => invalid
+      respond_to do |format|
+        format.html { redirect_to paragraphs_url  }
+        format.json { render head :no_content }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to paragraphs_url }
+        format.json { head :no_content }
+      end
     end
+
   end
 end
