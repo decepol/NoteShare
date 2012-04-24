@@ -1,7 +1,9 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  #def after_sign_out_path_for(resource_or_scope)
-   # redirect_to :controller => 'folders', :action => 'habubaba' 
-  #end
+  # akcja gry nie mamy autoryzacji, podnoszony jest wyjatek i robione przekierowanie
+  rescue_from CanCan::AccessDenied do |exception|
+    flash[:alert] = "Szpak mowi nie!"
+    redirect_to root_path
+  end
 end
